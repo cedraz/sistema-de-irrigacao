@@ -1,0 +1,47 @@
+# Servidor: no diretório só existem este arquivo e o .env.
+# Tudo vem do Docker Hub.
+#
+#   docker compose pull && docker compose up -d
+
+services:
+  mongo:
+    image: mongo:8
+    container_name: irrigacao-mongo
+    restart: unless-stopped
+    volumes:
+      - mongodados:/data/db
+    healthcheck:
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    image: icarocedraz/sistema-de-irrigacao:api-latest
+    pull_policy: always   # sem isto o up -d reaproveita o latest velho da máquina
+    container_name: irrigacao-api
+    restart: unless-stopped
+    environment:
+      MONGO_URL: "mongodb://mongo:27017"
+      MONGO_DB: "irrigacao"
+      TZ: "America/Sao_Paulo"
+      DEVICE_TOKEN: "${DEVICE_TOKEN:?defina DEVICE_TOKEN no .env}"
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # front = nginx. A imagem é feita a partir de nginx:stable-alpine
+  # (veja web/Dockerfile) com o site e o nginx.conf dentro.
+  # Serve o site e repassa /api e /ws pro container da api.
+  front:
+    image: icarocedraz/sistema-de-irrigacao:front-latest
+    pull_policy: always   # sem isto o up -d reaproveita o latest velho da máquina
+    container_name: irrigacao-front
+    restart: unless-stopped
+    ports:
+      - "10006:80" # é pra cá que o expor.sh aponta
+    depends_on:
+      - api
+
+volumes:
+  mongodados:

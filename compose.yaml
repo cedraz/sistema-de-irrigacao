@@ -1,0 +1,40 @@
+# Desenvolvimento: builda as imagens a partir do código.
+# O do servidor está em deploy/docker-compose.yml e só baixa do Docker Hub.
+
+services:
+  mongo:
+    image: mongo:8
+    restart: unless-stopped
+    volumes:
+      - mongodados:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./api
+    restart: unless-stopped
+    environment:
+      MONGO_URL: "mongodb://mongo:27017"
+      MONGO_DB: "irrigacao"
+      TZ: "America/Sao_Paulo"
+      DEVICE_TOKEN: "${DEVICE_TOKEN:?defina DEVICE_TOKEN no .env}"
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # front = nginx. A imagem é feita a partir de nginx:stable-alpine
+  # (veja web/Dockerfile) com o site e o nginx.conf dentro.
+  # Serve o site e repassa /api e /ws pro container da api.
+  front:
+    build: ./web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  mongodados:

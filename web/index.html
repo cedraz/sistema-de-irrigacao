@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d1210">
+<title>Irrigação</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪴</text></svg>">
+</head>
+<body>
+
+<header>
+  <h1>🪴 Irrigação</h1>
+  <div id="aviso" class="aviso escondido"></div>
+</header>
+
+<main>
+  <section class="cartao">
+    <p id="rotulo" class="rotulo">carregando…</p>
+    <p id="detalhe" class="detalhe"></p>
+
+    <button id="botao" class="botao" disabled>—</button>
+
+    <div id="duracao" class="duracao">
+      <span>por</span>
+      <button class="min" data-min="5">5 min</button>
+      <button class="min selecionado" data-min="10">10 min</button>
+      <button class="min" data-min="20">20 min</button>
+      <button class="min" data-min="30">30 min</button>
+    </div>
+  </section>
+
+  <section class="cartao">
+    <h2>Horários</h2>
+    <ul id="lista" class="lista"></ul>
+    <p id="vazio" class="vazio escondido">Nenhum horário programado.</p>
+    <button id="novo" class="secundario">+ Novo horário</button>
+  </section>
+  <section class="cartao">
+    <h2>Histórico</h2>
+    <ul id="historico" class="historico"></ul>
+    <p id="semHistorico" class="vazio escondido">Nenhuma rega ainda.</p>
+  </section>
+</main>
+
+<!-- Formulário de horário. Fica escondido até clicar em "novo". -->
+<div id="modal" class="modal escondido">
+  <form id="form" class="caixa">
+    <h2 id="tituloForm">Novo horário</h2>
+
+    <label for="hora">Começa às</label>
+    <input type="time" id="hora" required>
+
+    <label for="dur">Fica aberta por</label>
+    <div class="linha">
+      <input type="number" id="dur" min="1" max="120" value="10" required>
+      <span>minutos</span>
+    </div>
+
+    <label>Em quais dias</label>
+    <div id="dias" class="dias">
+      <button type="button" data-dia="0">dom</button>
+      <button type="button" data-dia="1">seg</button>
+      <button type="button" data-dia="2">ter</button>
+      <button type="button" data-dia="3">qua</button>
+      <button type="button" data-dia="4">qui</button>
+      <button type="button" data-dia="5">sex</button>
+      <button type="button" data-dia="6">sáb</button>
+    </div>
+    <button type="button" id="todos" class="link">todos os dias</button>
+
+    <div class="acoes">
+      <button type="button" id="cancelar" class="secundario">Cancelar</button>
+      <button type="submit" class="botaoForm">Salvar</button>
+    </div>
+  </form>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
